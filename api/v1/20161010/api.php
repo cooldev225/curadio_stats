@@ -49,7 +49,7 @@ $response = array();
 $mysqli = new cug__mysqli($cug_db_host, $cug_db_user, $cug_db_password, $cug_db_name, $cug_db_server_port, $cug_db_ssl, $cug_db_server_key, $cug_db_server_cert, $cug_db_ca_cert);
 $mysqli_rms_cache = new cug__mysqli($rms_cache_db_host, $rms_cache_db_user, $rms_cache_db_password, $rms_cache_db_name, $rms_cache_db_server_port, $rms_cache_db_ssl, $rms_cache_db_server_key, $rms_cache_db_server_cert, $rms_cache_db_ca_cert);
 $mysqli_rms_cache_global = new cug__mysqli($rms_cache_db_host, $rms_cache_db_user_global, $rms_cache_db_password_global, $db_name="", $rms_cache_db_server_port, $rms_cache_db_ssl, $rms_cache_db_server_key, $rms_cache_db_server_cert, $rms_cache_db_ca_cert);
-
+//$dev_f = fopen("log_dev.txt", "a");
 switch($ACTION) {
 	
 	// =1=
@@ -58,7 +58,6 @@ switch($ACTION) {
 	//********************************
 		$response[$ROOT_SUCCESS_NODE]['attributes']  = array('action' => (int)$ACTION, 'timestamp' => time());
 		$response[$ROOT_SUCCESS_NODE]['session_id']  = cugapi_init_session();
-		
 		cugapi_output($ACTION, $response);
 	break;
 
@@ -96,7 +95,40 @@ switch($ACTION) {
 	    
 	    cugapi_output($ACTION, $response);
 	    
+	//
+	break;
 	
+
+	// =recent_track=
+	//*********************************
+	case 'RECENT_TRACK' : 
+	//*********************************
+		$response[$ROOT_SUCCESS_NODE]['session_id']  = cugapi_init_session();
+
+		//capture parameters
+	    $track_ids = cug_rms_stat_capture_track_id($_POST); 
+	    $track_id_info = cug_rms_stat_get_track_id_info($track_ids['cugate_track_id'], $track_ids['shenzhen_track_id']);
+	    
+		$response[$ROOT_SUCCESS_NODE]['attributes'] = array('action' => (int)$ACTION, "{$track_id_info['track_id_field']}" => $track_id_info['track_id'], 'timestamp' => time());
+
+		$time_period_arr=explode(",","year_2022,year_2021,year_2020,last_365_days,last_30_days,last_7_days,year_2022__month_7,year_2022__month_6,year_2022__month_5,year_2022__month_4,year_2022__month_3,year_2022__month_2,year_2022__month_1,year_2021__month_12,year_2021__month_11,year_2021__month_10,year_2021__month_9,year_2021__month_8,year_2021__month_7,year_2021__month_6,year_2021__month_5,year_2021__month_4,year_2021__month_3,year_2021__month_2,year_2021__month_1");
+	    $output_format = !empty($_POST['f']) ? strtolower($_POST['f']) : "";
+		$amounts = !empty($_POST['amounts']) ? $_POST['amounts'] : ""; //get amounts or not for composer or artist or for both
+		
+		for($i=0;$i<count($time_period_arr);$i++){
+			$time_period = $time_period_arr[$i];
+			$data[$i]['time_period'] = $time_period;
+			//get data
+			$data[$i]['data'] = cug_rms_stat_get_data_by_object("TRACK", $track_ids['cugate_track_id'], $track_ids['shenzhen_track_id'], $time_period, $limit=3, $amounts);
+		}		
+	    
+		$response[$ROOT_SUCCESS_NODE]['result'] = $data;
+	    
+		//output
+	    if($output_format == $OUTPUT_FORMAT['web'])
+	        $API_OUTPUT_FORMAT = $OUTPUT_FORMAT['web'];
+
+		cugapi_output($ACTION, $response);
 	break;
 	
 	

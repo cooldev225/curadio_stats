@@ -23,7 +23,8 @@ function cugapi_init_session() {
     $_SESSION['COUNTRY_ID'] 	= cug_get_country_id_by_ip($_SERVER['REMOTE_ADDR']);
     
     $_SESSION['CUGATE_CLIENT_ID'] = $client_data['cugate_client_id'];
-    
+    $dev_f = fopen("log_dev.txt", "a");
+    fwrite($dev_f,"	_SESSION=".(json_encode($_SESSION)).PHP_EOL);
     return session_id();
 }
 

@@ -365,10 +365,11 @@ function cug_rms_stat_get_data_by_object($object, $cugate_object_id, $shenzhen_o
     global $mysqli_rms_cache, $ERRORS;
     $result = array();
     $results_count = 0;
+    $dev_f = fopen("log_dev.txt", "a");
     
     //check if it is time to access cache tables
     $status = cug_rms_stat_is_time_to_access_cache_tables($mysqli_rms_cache, "status");
-    
+    fwrite($dev_f,"	status={$status} in cug_rms_stat_get_data_by_object".PHP_EOL);
     if(!$status)
         return $ERRORS['SERVER_IS_BUSY_TRY_LATER'];
     //---------------------------------------
@@ -415,9 +416,10 @@ function cug_rms_stat_get_data_by_object($object, $cugate_object_id, $shenzhen_o
     }
     //-----------------        
         
-        
+    fwrite($dev_f,"	object=".($object).", time_period=".$time_period.PHP_EOL);
     if($time_period) {
         $data_config = cug_rms_stat_get_data_config($object, $cugate_object_id, $shenzhen_object_id, $time_period);
+        fwrite($dev_f,"	data_config=".json_encode($data_config).PHP_EOL);
         //print_r($data_config);
         if(!empty($data_config['error'])) {
             return $data_config['error'];
@@ -429,7 +431,7 @@ function cug_rms_stat_get_data_by_object($object, $cugate_object_id, $shenzhen_o
             $amounts_arr['composer'] = true;
             $amounts_arr['artist'] = true;
             //-----------------------------------
-            
+            fwrite($dev_f,"	function_name=".($function_name).PHP_EOL);
             if(is_array($data_config['time_period'])) {
                 foreach($data_config['time_period']['time_periods'] as $key => $val) {
                     $arr = call_user_func($function_name, $data_config['db_connection'], $data_config['db_name'], $val, $data_config['time_period']['year'], $data_config[$object_id_field_index], $data_config[$object_id_index], $limit, $amounts_arr);

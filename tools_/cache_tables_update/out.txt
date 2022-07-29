@@ -1,0 +1,55 @@
+START: 2022-01-19 03:16:07
+
+cug_rms_update_track_played_total
+cug_rms_update_track_played_by_continent
+cug_rms_update_track_played_by_country
+cug_rms_update_track_played_by_subdivision
+cug_rms_update_track_played_by_city
+cug_rms_update_track_played_by_station
+cug_rms_update_track_played_by_daytime
+cug_rms_update_track_played_by_daytime_continent
+cug_rms_update_track_played_by_daytime_country
+cug_rms_update_track_played_by_daytime_subdivision
+[] >> SELECT r.shenzhen_track_id, s.continent_code, s.country_code, s.subdivision_code, s.subdivision_name, COUNT(CASE WHEN played_time >= '00:00:00' AND played_time < '01:00:00' THEN 1 END) AS played_num_0,COUNT(CASE WHEN played_time >= '01:00:00' AND played_time < '02:00:00' THEN 1 END) AS played_num_1,COUNT(CASE WHEN played_time >= '02:00:00' AND played_time < '03:00:00' THEN 1 END) AS played_num_2,COUNT(CASE WHEN played_time >= '03:00:00' AND played_time < '04:00:00' THEN 1 END) AS played_num_3,COUNT(CASE WHEN played_time >= '04:00:00' AND played_time < '05:00:00' THEN 1 END) AS played_num_4,COUNT(CASE WHEN played_time >= '05:00:00' AND played_time < '06:00:00' THEN 1 END) AS played_num_5,COUNT(CASE WHEN played_time >= '06:00:00' AND played_time < '07:00:00' THEN 1 END) AS played_num_6,COUNT(CASE WHEN played_time >= '07:00:00' AND played_time < '08:00:00' THEN 1 END) AS played_num_7,COUNT(CASE WHEN played_time >= '08:00:00' AND played_time < '09:00:00' THEN 1 END) AS played_num_8,COUNT(CASE WHEN played_time >= '09:00:00' AND played_time < '10:00:00' THEN 1 END) AS played_num_9,COUNT(CASE WHEN played_time >= '10:00:00' AND played_time < '11:00:00' THEN 1 END) AS played_num_10,COUNT(CASE WHEN played_time >= '11:00:00' AND played_time < '12:00:00' THEN 1 END) AS played_num_11,COUNT(CASE WHEN played_time >= '12:00:00' AND played_time < '13:00:00' THEN 1 END) AS played_num_12,COUNT(CASE WHEN played_time >= '13:00:00' AND played_time < '14:00:00' THEN 1 END) AS played_num_13,COUNT(CASE WHEN played_time >= '14:00:00' AND played_time < '15:00:00' THEN 1 END) AS played_num_14,COUNT(CASE WHEN played_time >= '15:00:00' AND played_time < '16:00:00' THEN 1 END) AS played_num_15,COUNT(CASE WHEN played_time >= '16:00:00' AND played_time < '17:00:00' THEN 1 END) AS played_num_16,COUNT(CASE WHEN played_time >= '17:00:00' AND played_time < '18:00:00' THEN 1 END) AS played_num_17,COUNT(CASE WHEN played_time >= '18:00:00' AND played_time < '19:00:00' THEN 1 END) AS played_num_18,COUNT(CASE WHEN played_time >= '19:00:00' AND played_time < '20:00:00' THEN 1 END) AS played_num_19,COUNT(CASE WHEN played_time >= '20:00:00' AND played_time < '21:00:00' THEN 1 END) AS played_num_20,COUNT(CASE WHEN played_time >= '21:00:00' AND played_time < '22:00:00' THEN 1 END) AS played_num_21,COUNT(CASE WHEN played_time >= '22:00:00' AND played_time < '23:00:00' THEN 1 END) AS played_num_22,COUNT(CASE WHEN played_time >= '23:00:00' AND played_time < '24:00:00' THEN 1 END) AS played_num_23,(COUNT(CASE WHEN played_time >= '00:00:00' AND played_time < '01:00:00' THEN 1 END) * duration) AS airtime_0,(COUNT(CASE WHEN played_time >= '01:00:00' AND played_time < '02:00:00' THEN 1 END) * duration) AS airtime_1,(COUNT(CASE WHEN played_time >= '02:00:00' AND played_time < '03:00:00' THEN 1 END) * duration) AS airtime_2,(COUNT(CASE WHEN played_time >= '03:00:00' AND played_time < '04:00:00' THEN 1 END) * duration) AS airtime_3,(COUNT(CASE WHEN played_time >= '04:00:00' AND played_time < '05:00:00' THEN 1 END) * duration) AS airtime_4,(COUNT(CASE WHEN played_time >= '05:00:00' AND played_time < '06:00:00' THEN 1 END) * duration) AS airtime_5,(COUNT(CASE WHEN played_time >= '06:00:00' AND played_time < '07:00:00' THEN 1 END) * duration) AS airtime_6,(COUNT(CASE WHEN played_time >= '07:00:00' AND played_time < '08:00:00' THEN 1 END) * duration) AS airtime_7,(COUNT(CASE WHEN played_time >= '08:00:00' AND played_time < '09:00:00' THEN 1 END) * duration) AS airtime_8,(COUNT(CASE WHEN played_time >= '09:00:00' AND played_time < '10:00:00' THEN 1 END) * duration) AS airtime_9,(COUNT(CASE WHEN played_time >= '10:00:00' AND played_time < '11:00:00' THEN 1 END) * duration) AS airtime_10,(COUNT(CASE WHEN played_time >= '11:00:00' AND played_time < '12:00:00' THEN 1 END) * duration) AS airtime_11,(COUNT(CASE WHEN played_time >= '12:00:00' AND played_time < '13:00:00' THEN 1 END) * duration) AS airtime_12,(COUNT(CASE WHEN played_time >= '13:00:00' AND played_time < '14:00:00' THEN 1 END) * duration) AS airtime_13,(COUNT(CASE WHEN played_time >= '14:00:00' AND played_time < '15:00:00' THEN 1 END) * duration) AS airtime_14,(COUNT(CASE WHEN played_time >= '15:00:00' AND played_time < '16:00:00' THEN 1 END) * duration) AS airtime_15,(COUNT(CASE WHEN played_time >= '16:00:00' AND played_time < '17:00:00' THEN 1 END) * duration) AS airtime_16,(COUNT(CASE WHEN played_time >= '17:00:00' AND played_time < '18:00:00' THEN 1 END) * duration) AS airtime_17,(COUNT(CASE WHEN played_time >= '18:00:00' AND played_time < '19:00:00' THEN 1 END) * duration) AS airtime_18,(COUNT(CASE WHEN played_time >= '19:00:00' AND played_time < '20:00:00' THEN 1 END) * duration) AS airtime_19,(COUNT(CASE WHEN played_time >= '20:00:00' AND played_time < '21:00:00' THEN 1 END) * duration) AS airtime_20,(COUNT(CASE WHEN played_time >= '21:00:00' AND played_time < '22:00:00' THEN 1 END) * duration) AS airtime_21,(COUNT(CASE WHEN played_time >= '22:00:00' AND played_time < '23:00:00' THEN 1 END) * duration) AS airtime_22,(COUNT(CASE WHEN played_time >= '23:00:00' AND played_time < '24:00:00' THEN 1 END) * duration) AS airtime_23 FROM cr_detect_results__year_2021 AS r INNER JOIN cr_stations AS s ON r.station_id=s.id WHERE r.cugate_track_id=1 AND r.duration>0 GROUP BY s.country_code, s.subdivision_code
+[] >> INSERT INTO curadio_cache_2021.track_played_by_daytime_subdivision__year_2021 VALUES(NULL,1,1,'SZ','CN','SZH','SZH',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,1,11,NOW())
+cug_rms_update_track_played_by_daytime_city
+cug_rms_update_track_played_by_daytime_station
+cug_rms_update_track_played_by_artist
+cug_rms_update_artist_played_by_daytime_continent
+cug_rms_update_artist_played_by_country
+cug_rms_update_artist_played_total
+cug_rms_update_artist_played_by_continent
+cug_rms_update_artist_played_by_daytime
+cug_rms_update_artist_played_by_station
+cug_rms_update_artist_played_by_subdivision
+cug_rms_update_artist_played_by_city
+cug_rms_update_artist_played_by_daytime_country
+cug_rms_update_artist_played_by_daytime_subdivision
+cug_rms_update_artist_played_by_daytime_city
+cug_rms_update_artist_played_by_daytime_station
+cug_rms_update_label_played_by_city
+cug_rms_update_label_played_by_subdivision
+cug_rms_update_label_played_by_country
+cug_rms_update_label_played_by_daytime_continent
+cug_rms_update_label_played_by_daytime_station
+cug_rms_update_label_played_total
+cug_rms_update_label_played_by_continent
+cug_rms_update_label_played_by_daytime
+cug_rms_update_label_played_by_station
+cug_rms_update_label_played_by_daytime_country
+cug_rms_update_label_played_by_daytime_subdivision
+cug_rms_update_label_played_by_daytime_city
+cug_rms_update_publisher_played_by_daytime_continent
+cug_rms_update_publisher_played_by_country
+cug_rms_update_publisher_played_total
+cug_rms_update_publisher_played_by_continent
+cug_rms_update_publisher_played_by_daytime
+cug_rms_update_publisher_played_by_station
+cug_rms_update_publisher_played_by_subdivision
+cug_rms_update_publisher_played_by_city
+cug_rms_update_publisher_played_by_daytime_country
+cug_rms_update_publisher_played_by_daytime_subdivision
+cug_rms_update_publisher_played_by_daytime_city
+cug_rms_update_publisher_played_by_daytime_station
+
+END: 2022-01-19 03:16:14

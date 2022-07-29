@@ -1,0 +1,6 @@
+
+START: 2017-03-15 06:25:01
+2017-03-15 06:25:24 - Table:cr_detect_results__last_7_days - Status:OK
+2017-03-15 06:27:50 - Table:cr_detect_results__last_30_days - Status:OK
+2017-03-15 06:56:09 - Table:cr_detect_results__last_365_days - Status:UNABLE_TO_EXTRACT_DATA
+2017-03-15 06:56:09 - Table:cr_detect_results__last_year - Status:UNABLE_TO_CREATE_TABLE

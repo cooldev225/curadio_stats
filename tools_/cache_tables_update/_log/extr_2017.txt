@@ -1,0 +1,5 @@
+START: 2017-08-28 21:27:06
+
+cr_detect_results__year_2017 - OK
+
+END: 2017-08-28 22:23:28

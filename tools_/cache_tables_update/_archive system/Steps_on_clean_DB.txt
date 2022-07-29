@@ -1,0 +1,48 @@
+Main steps to be done on clean (new) DB Server:
+--------------------------------------------------
+
+1. Import all archive databases and current database
+	archive databases:
+	'curadio_cache_2015_20170210.sql' - db name: curadio_cache_2015
+	'curadio_cache_2016_20170210.sql' - db name: curadio_cache_2016
+	
+	current database:
+	'curadio_cache_20170210.sql' - db name: curadio_cache
+	
+	note: 
+	do this by this command: mysql -u [uname] -p [databasename] < ***.sql
+	before importing, all databases should be created manually
+
+	
+2. Calculate stats data manually for missing months in current year, for example if now is 2017, August and current database contains data for month 01 (January) only then calculate data for months 02,03,04,05,06; You don't need to calculate data for month 07, because auto calculate script (which will be running later in cronjobs) will do it using tables '..._last_month'; for more details see file 'manual_calculation.txt'
+	2.0 first of all copy/replace table 'curadio.cr_stations' from Tony's server (85.214.225.102) to table 'curadio_cache.cr_stations' on stats server manually 
+	2.1 create database 'curadio_cache_2017' manually (this database should be deleted when all process will be done)
+	2.1 Start process
+		2.1.1 extract data from Tony's table by following commands
+			- php "manual_extr_year_month.php" 2017 > "_log/extr_2017.txt" &
+			when script will finish working run next command
+			- php "manual_extr_year_month.php" 2017 2-3-4-5-6 > "_log/extr_2017_2-3-4-5-6.txt" &
+			finally you should have created following tables on Tony's server (85.214.225.102):
+				cr_detect_results__year_2017
+				cr_detect_results__year_2017__month_02, cr_detect_results__year_2017__month_03, ... ,cr_detect_results__year_2017__month_06
+				
+		2.1.2 calculate data from extracted tables by these commands
+			- php "manual_calc_year_month.php" 2017 2 MONTH > "_log/extr_2017_2.txt" &
+			- php "manual_calc_year_month.php" 2017 2 MONTH > "_log/extr_2017_3.txt" &
+			...
+			- php "manual_calc_year_month.php" 2017 2 MONTH > "_log/extr_2017_6.txt" &
+			you can run these commands one by one, not waiting while previuosly running command will be finished 
+
+			
+3.	Run cronjobs for auto calculation scripts	
+	
+	3.1 In parallel of step 2.1.2 you can already enable auto calculation scripts in cronjobs (see in documentation 'Statistics_System_Technical_Description_20170403.pdf')
+		3.1.1 check that auto calculation scripts are running, if not then check all 'sh' files in '/var/www/html/tools/cache_tables_update/_sh' has right permissions or check in documentation 'Statistics_System_Technical_Description_20170403.pdf'
+
+	3.2 wait until steps 2.1.2 and 3.1 will be finished
+	
+
+4.	Start cleanup process (before deleting anything be sure that everything is copied/created/calculated correctly)	
+	4.1 after finishing step 2.1.2 you should copy all tables from database 'curadio_cache_2017' to current database 'curadio_cache', then delete database 'curadio_cache_2017', also you can delete (this is optional) extracted databases from Tony's server: cr_detect_results__year_2017, cr_detect_results__year_2017__month_02, cr_detect_results__year_2017__month_03, ... ,cr_detect_results__year_2017__month_06
+
+	

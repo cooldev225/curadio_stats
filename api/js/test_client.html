@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Test</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script type="text/javascript">
+var AJAX_URL = "https://stats.cugate.com/js/";
+
+//------------
+function get_track_stat_data() {	
+	$.post(AJAX_URL, 
+		{
+		  a: 2,
+		  f: "json",
+		  cugate_track_id: 2874120,
+		  time_period: "last_year"
+		},		
+		function(data, status) {	
+			console.log(data);
+			alert(data);
+		})
+		  .done(function() {
+			
+		  })
+		  .fail(function() {
+			//alert( "error" );
+		  })
+		  .always(function() {
+			//alert( "finished" );
+		});	
+}
+
+//------------
+function get_area_list() {	
+	$.post(AJAX_URL, 
+		{
+		  a: 3,
+		  f: "json"
+		},		
+		function(data, status) {	
+			console.log(data);
+			alert(data);
+		})
+		  .done(function() {
+			
+		  })
+		  .fail(function() {
+			//alert( "error" );
+		  })
+		  .always(function() {
+			//alert( "finished" );
+		});	
+}
+
+//------------
+function check_track() {	
+	$.post(AJAX_URL, 
+		{
+		  a: 4,
+		  f: "json",
+		  cugate_track_id: 2874120
+		},		
+		function(data, status) {	
+			console.log(data);
+		})
+		  .done(function() {
+			
+		  })
+		  .fail(function() {
+			//alert( "error" );
+		  })
+		  .always(function() {
+			//alert( "finished" );
+		});	
+}
+
+//------------
+function get_artist_stat_data() {	
+	$.post(AJAX_URL, 
+		{
+		  a: 6,
+		  f: "json",
+		  cugate_member_id: 109220,
+		  time_period: "last_7_days"
+		},		
+		function(data, status) {	
+			console.log(data);
+			alert(data);
+		})
+		  .done(function() {
+			
+		  })
+		  .fail(function() {
+			//alert( "error" );
+		  })
+		  .always(function() {
+			//alert( "finished" );
+		});	
+}
+
+//------------
+function check_artist() {	
+	$.post(AJAX_URL, 
+		{
+		  a: 7,
+		  f: "json",
+		  cugate_member_id: 109220
+		},		
+		function(data, status) {	
+			console.log(data);
+		})
+		  .done(function() {
+			
+		  })
+		  .fail(function() {
+			//alert( "error" );
+		  })
+		  .always(function() {
+			//alert( "finished" );
+		});	
+}
+</script>
+</head>
+
+<body>
+	<input type="button" value="Get Track Stat Data" onclick="get_track_stat_data();" />
+	<input type="button" value="Get Area List" onclick="get_area_list();" />
+	<input type="button" value="Check Track" onclick="check_track();" />
+	<input type="button" value="Get Artist Stat Data" onclick="get_artist_stat_data();" />
+	<input type="button" value="Check Artist" onclick="check_artist();" />
+</body>
+
+</html>

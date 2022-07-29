@@ -1,0 +1,29 @@
+START: 2018-01-28 14:05:12
+
+cr_detect_results__year_2017 - OK
+cr_detect_results__year_2017__month_01 - OK
+cr_detect_results__year_2017__month_01 - OK
+cr_detect_results__year_2017__month_02 - OK
+cr_detect_results__year_2017__month_02 - OK
+cr_detect_results__year_2017__month_03 - OK
+cr_detect_results__year_2017__month_03 - OK
+cr_detect_results__year_2017__month_04 - OK
+cr_detect_results__year_2017__month_04 - OK
+cr_detect_results__year_2017__month_05 - OK
+cr_detect_results__year_2017__month_05 - OK
+cr_detect_results__year_2017__month_06 - OK
+cr_detect_results__year_2017__month_06 - OK
+cr_detect_results__year_2017__month_07 - OK
+cr_detect_results__year_2017__month_07 - OK
+cr_detect_results__year_2017__month_08 - OK
+cr_detect_results__year_2017__month_08 - OK
+cr_detect_results__year_2017__month_09 - OK
+cr_detect_results__year_2017__month_09 - OK
+cr_detect_results__year_2017__month_10 - OK
+cr_detect_results__year_2017__month_10 - OK
+cr_detect_results__year_2017__month_11 - OK
+cr_detect_results__year_2017__month_11 - OK
+cr_detect_results__year_2017__month_12 - OK
+cr_detect_results__year_2017__month_12 - OK
+
+END: 2018-01-28 14:32:39

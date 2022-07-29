@@ -1,0 +1,8 @@
+# At every 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 and 55th minute past every hour
+*/5 * * * * /var/www/html/tools/cache_tables_update/_sh/1_extract_stat_data.sh
+
+# At every 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 and 55th minute past every hour
+*/5 * * * * /var/www/html/tools/cache_tables_update/_sh/2_calc_stat_data.sh
+
+# At every 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 and 55th minute past every hour
+*/5 * * * * /var/www/html/tools/cache_tables_update/_sh/3_rename_cache_tables.sh

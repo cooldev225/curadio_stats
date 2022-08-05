@@ -97,6 +97,42 @@ switch($ACTION) {
 	    
 	//
 	break;
+
+	// =2=
+	//********************************
+	case -($ACTIONS['GET_TRACK_STAT_DATA']) : 
+		//********************************	  
+		$response[$ROOT_SUCCESS_NODE]['session_id']  = cugapi_init_session();
+			//capture parameters
+			$track_ids = cug_rms_stat_capture_track_id($_POST); 
+			$track_id_info = cug_rms_stat_get_track_id_info($track_ids['cugate_track_id'], $track_ids['shenzhen_track_id']);
+			
+			$time_period = !empty($_POST['time_period']) ? $_POST['time_period'] : "";
+			$amounts = !empty($_POST['amounts']) ? $_POST['amounts'] : ""; //get amounts or not for composer or artist or for both
+			
+			$output_format = !empty($_POST['f']) ? strtolower($_POST['f']) : "";
+			
+			//get data
+			$data = cug_rms_stat_get_data_by_object("TRACK", $track_ids['cugate_track_id'], $track_ids['shenzhen_track_id'], $time_period, $limit=3, $amounts);
+			//print_r($data);
+			
+			if($data > 0) { // OK
+				$response[$ROOT_SUCCESS_NODE]['attributes'] = array('action' => (int)$ACTION, "{$track_id_info['track_id_field']}" => $track_id_info['track_id'], 'timestamp' => time());
+				$response[$ROOT_SUCCESS_NODE]['result']  = $data;
+			}
+			else { // Error
+				$response[$ROOT_ERROR_NODE]['code']  = (int)$data;
+				$response[$ROOT_ERROR_NODE]['msg']   = array_search($data, $ERRORS);
+			}
+			
+			//output
+			if($output_format == $OUTPUT_FORMAT['web'])
+				$API_OUTPUT_FORMAT = $OUTPUT_FORMAT['web'];
+			
+			cugapi_output($ACTION, $response);
+			
+		//
+		break;
 	
 
 	// =recent_track=

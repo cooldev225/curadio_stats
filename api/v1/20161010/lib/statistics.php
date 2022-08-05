@@ -432,9 +432,15 @@ function cug_rms_stat_get_data_by_object($object, $cugate_object_id, $shenzhen_o
             $amounts_arr['artist'] = true;
             //-----------------------------------
             fwrite($dev_f,"	function_name=".($function_name).PHP_EOL);
+            fwrite($dev_f,"	    ".json_encode($data_config['time_period']).PHP_EOL);
+            $fun_customized_name = $function_name;
+            if($function_name=='cug_rms_stat_get_data_by_track_timeperiod'&&($data_config['track_id']=='14804908'||$data_config['track_id']=='17988297'||$data_config['track_id']=='14743358'||$data_config['track_id']=='17987371'||$data_config['track_id']=='14864700'||$data_config['track_id']=='14724000'||$data_config['track_id']=='17988020'||$data_config['track_id']=='17533556'||$data_config['track_id']=='14799923'||$data_config['track_id']=='17987391'))                  
+                $fun_customized_name.="_improved";
+            fwrite($dev_f,"	    fun_customized_name=".($fun_customized_name).PHP_EOL);
             if(is_array($data_config['time_period'])) {
-                foreach($data_config['time_period']['time_periods'] as $key => $val) {
-                    $arr = call_user_func($function_name, $data_config['db_connection'], $data_config['db_name'], $val, $data_config['time_period']['year'], $data_config[$object_id_field_index], $data_config[$object_id_index], $limit, $amounts_arr);
+                foreach($data_config['time_period']['time_periods'] as $key => $val) {  
+                    
+                    $arr = call_user_func($fun_customized_name, $data_config['db_connection'], $data_config['db_name'], $val, $data_config['time_period']['year'], $data_config[$object_id_field_index], $data_config[$object_id_index], $limit, $amounts_arr);
                     
                     if($arr > 0) {
                         $result[$data_config['time_period']['time_periods_output'][$key]] = $arr;
@@ -443,7 +449,7 @@ function cug_rms_stat_get_data_by_object($object, $cugate_object_id, $shenzhen_o
                 }
             }
             else {
-                $arr = call_user_func($function_name, $data_config['db_connection'], $data_config['db_name'], $data_config['time_period'], $year="", $data_config[$object_id_field_index], $data_config[$object_id_index], $limit, $amounts_arr);
+                $arr = call_user_func($fun_customized_name, $data_config['db_connection'], $data_config['db_name'], $data_config['time_period'], $year="", $data_config[$object_id_field_index], $data_config[$object_id_index], $limit, $amounts_arr);
                 
                 if($arr > 0) {
                     $result[$data_config['time_period']] = $arr;
@@ -533,7 +539,7 @@ function cug_rms_stat_parse_amounts_parameter($amounts) {
 function cug_rms_stat_get_data_by_track_timeperiod($mysqli, $db_name, $time_period, $year, $track_id_field, $track_id,  $limit, $amounts_arr) {
     global $ERRORS;
     $result = array();
-    
+    $dev_f = fopen("log_dev.txt", "a");
     $time_period = strtolower($time_period);
 
     //track played total
@@ -909,6 +915,366 @@ function cug_rms_stat_get_data_by_track_timeperiod($mysqli, $db_name, $time_peri
                         }
                     }
                 }
+            }
+        }
+    }
+    else
+        return $ERRORS['NO_STAT_DATA'];
+
+
+   return $result;
+}
+function cug_rms_stat_get_data_by_track_timeperiod_improved($mysqli, $db_name, $time_period, $year, $track_id_field, $track_id,  $limit, $amounts_arr) {
+    global $ERRORS;
+    $result = array();
+    $dev_f = fopen("log_dev.txt", "a");
+    $time_period = strtolower($time_period);
+
+    //track played total
+    $table = "track_played_total__".$time_period;
+	
+    if(!$mysqli->table_exists_in_db($db_name, $table)) {
+        return $ERRORS['NO_STAT_DATA'];
+    }
+    fwrite($dev_f,"	    db_name=".$db_name.", time_period=".$time_period.", year=".$year.", track_id_field=".$track_id_field.", track_id=".$track_id.", limit=".$limit.", amounts_arr=".json_encode($amounts_arr).PHP_EOL);
+    $table = $db_name.".track_played_total__".$time_period;
+	
+    $played_num_total = 0;
+    $query = "SELECT played_num, rank_num FROM $table WHERE $track_id_field=$track_id";
+	fwrite($dev_f,"	    sql=".$query.PHP_EOL);
+    $r = $mysqli->query($query);
+	
+    if($r && $r->num_rows) {
+	
+        $row = $r->fetch_assoc();
+        $played_num_total = $row['played_num'];
+        $rank_num_total = $row['rank_num'];
+    }
+    fwrite($dev_f,"	    table=".$table.", played_num_total=".$played_num_total.", rank_num_total=".$rank_num_total.PHP_EOL);
+    //---------------------------------
+    if($played_num_total > 0) {
+        $result['total'][0] = (int)$played_num_total;
+        $result['total'][1] = (int)$rank_num_total;
+
+        //track played by daytimes, totall
+        $table = $db_name.".track_played_by_daytime__".$time_period;       
+           
+        //$query = "SELECT * FROM $table WHERE $track_id_field=$track_id";
+        //$arr = cug_rms_stat_object_played_by_daytime($mysqli, $query);
+        //if(count($arr) > 0)$result['total']['daytime'] = $arr;
+        $query = "SELECT CONCAT(played_num_00,',',played_num_01,',',played_num_02,',',played_num_03,',',played_num_04,',',played_num_05,',',played_num_06,',',played_num_07,',',played_num_08,',',played_num_09,',',played_num_10,',',played_num_11,',',played_num_12,',',played_num_13,',',played_num_14,',',played_num_15,',',played_num_16,',',played_num_17,',',played_num_18,',',played_num_19,',',played_num_20,',',played_num_21,',',played_num_22,',',played_num_23) as daytime FROM $table WHERE $track_id_field=$track_id";
+        $r = $mysqli->query($query);
+        if($r && $r->num_rows) {
+            $row = $r->fetch_assoc();
+            $result['total']['daytime'] = $row['daytime'];
+        }
+        fwrite($dev_f,"	    sql=".$query.PHP_EOL);
+        
+        //track played by continent
+        $table_a = $db_name.".track_played_by_continent__".$time_period;
+        $table_b = $db_name.".track_played_by_daytime_continent__".$time_period;
+        $table_c = $db_name.".track_played_by_country__".$time_period;
+        $table_d = $db_name.".track_played_by_daytime_country__".$time_period;
+        $table_e = $db_name.".track_played_by_subdivision__".$time_period;
+        $table_f = $db_name.".track_played_by_daytime_subdivision__".$time_period;
+        $table_g = $db_name.".track_played_by_city__".$time_period;
+        $table_h = $db_name.".track_played_by_daytime_city__".$time_period;
+        $table_i = $db_name.".track_played_by_station__".$time_period;
+        $table_j = $db_name.".track_played_by_daytime_station__".$time_period;
+        $daytime_fields = "CONCAT(played_num_00,',',played_num_01,',',played_num_02,',',played_num_03,',',played_num_04,',',played_num_05,',',played_num_06,',',played_num_07,',',played_num_08,',',played_num_09,',',played_num_10,',',played_num_11,',',played_num_12,',',played_num_13,',',played_num_14,',',played_num_15,',',played_num_16,',',played_num_17,',',played_num_18,',',played_num_19,',',played_num_20,',',played_num_21,',',played_num_22,',',played_num_23)";
+        $query = "select a.continent_code, a.played_num as continent_played_num, a.rank_num as continent_rank_num, b.continent_daytime, c.country_code, c.played_num as country_played_num, c.rank_num as country_rank_num, d.country_daytime, e.subdivision_code, e.played_num as subdivision_played_num, e.rank_num as subdivision_rank_num,f.subdivision_daytime, g.city, g.played_num as city_played_num, g.rank_num as city_rank_num, h.city_daytime, i.station_id, i.played_num as station_played_num, i.rank_num as station_rank_num, j.station_daytime
+        from (select continent_code, played_num, rank_num from $table_a where $track_id_field=$track_id order by played_num desc limit $limit) a
+        left join (select continent_code, $daytime_fields as continent_daytime from $table_b where $track_id_field=$track_id) b
+            on a.continent_code = b.continent_code
+        left join (select cc.* from (SELECT country_code,played_num,rank_num,@row_num := IF(@continent_code=continent_code,@row_num+1,1) AS RowNumber,@continent_code:= continent_code as continent_code FROM $table_c where $track_id_field=$track_id ORDER BY continent_code desc) cc where cc.RowNumber<=$limit order by cc.played_num desc) c
+            on a.continent_code = c.continent_code
+        left join (select continent_code, country_code, $daytime_fields as country_daytime from $table_d where $track_id_field=$track_id) d
+            on a.continent_code = d.continent_code and c.country_code = d.country_code
+        left join (select ee.* from (SELECT subdivision_code,played_num,rank_num,@row_num := IF(@country_code=country_code,@row_num+1,1) AS RowNumber,@country_code:= country_code as country_code FROM $table_e where $track_id_field=$track_id ORDER BY country_code) ee where ee.RowNumber<=$limit order by ee.played_num desc) e
+            on c.country_code = e.country_code
+        left join (select country_code, subdivision_code, CONCAT(played_num_00,',',played_num_01,',',played_num_02,',',played_num_03,',',played_num_04,',',played_num_05,',',played_num_06,',',played_num_07,',',played_num_08,',',played_num_09,',',played_num_10,',',played_num_11,',',played_num_12,',',played_num_13,',',played_num_14,',',played_num_15,',',played_num_16,',',played_num_17,',',played_num_18,',',played_num_19,',',played_num_20,',',played_num_21,',',played_num_22,',',played_num_23) as subdivision_daytime from $table_f where $track_id_field=$track_id) f
+            on e.subdivision_code = f.subdivision_code and c.country_code = f.country_code
+        left join (select gg.* from (SELECT city,country_code,played_num,rank_num,@row_num := IF(@subdivision_code=subdivision_code,@row_num+1,1) AS RowNumber,@subdivision_code:= subdivision_code as subdivision_code FROM $table_g where $track_id_field=$track_id ORDER BY subdivision_code) gg where gg.RowNumber<=$limit order by gg.played_num desc) g
+            on e.subdivision_code = g.subdivision_code and c.country_code = g.country_code
+        left join (select country_code, subdivision_code, city, CONCAT(played_num_00,',',played_num_01,',',played_num_02,',',played_num_03,',',played_num_04,',',played_num_05,',',played_num_06,',',played_num_07,',',played_num_08,',',played_num_09,',',played_num_10,',',played_num_11,',',played_num_12,',',played_num_13,',',played_num_14,',',played_num_15,',',played_num_16,',',played_num_17,',',played_num_18,',',played_num_19,',',played_num_20,',',played_num_21,',',played_num_22,',',played_num_23) as city_daytime from $table_h where $track_id_field=$track_id) h
+            on e.subdivision_code = h.subdivision_code and c.country_code = h.country_code and g.city = h.city
+        left join (select ii.* from (SELECT station_id,country_code,subdivision_code,played_num,rank_num,@row_num := IF(@city=city,@row_num+1,1) AS RowNumber,@city:= city as city FROM $table_i where $track_id_field=$track_id ORDER BY city) ii where ii.RowNumber<=$limit order by ii.played_num desc) i
+            on e.subdivision_code = i.subdivision_code and c.country_code = i.country_code and g.city = i.city
+		left join (select country_code, subdivision_code, city, station_id, CONCAT(played_num_00,',',played_num_01,',',played_num_02,',',played_num_03,',',played_num_04,',',played_num_05,',',played_num_06,',',played_num_07,',',played_num_08,',',played_num_09,',',played_num_10,',',played_num_11,',',played_num_12,',',played_num_13,',',played_num_14,',',played_num_15,',',played_num_16,',',played_num_17,',',played_num_18,',',played_num_19,',',played_num_20,',',played_num_21,',',played_num_22,',',played_num_23) as station_daytime from $table_j where  $track_id_field=$track_id) j
+            on e.subdivision_code = j.subdivision_code and c.country_code = j.country_code and g.city = j.city and i.station_id = j.station_id
+        order by a.played_num desc, c.played_num desc, e.played_num desc, g.played_num desc, i.played_num desc";
+        fwrite($dev_f,"	    total querz=".str_replace('\n',' ',$query).PHP_EOL.PHP_EOL);
+        //$query = "SELECT a.continent_code, a.played_num, a.rank_num,$daytime_fields as daytime FROM $table_a a left join $table_b b on a.continent_code=b.continent_code WHERE a.$track_id_field=$track_id and b.$track_id_field=$track_id ORDER BY a.played_num DESC LIMIT $limit ";
+        $r = $mysqli->query("select cc.* from (SELECT country_code,played_num,rank_num,@row_num := IF(@continent_code=continent_code,@row_num+1,1) AS RowNumber,@continent_code:= continent_code as continent_code FROM curadio_cache.track_played_by_country__this_year where cugate_track_id=17988297 ORDER BY continent_code) cc where cc.RowNumber<4 order by cc.played_num desc");
+        $r = $mysqli->query("select ee.* from (SELECT subdivision_code,played_num,rank_num,@row_num := IF(@country_code=country_code,@row_num+1,1) AS RowNumber,@country_code:= country_code as country_code FROM curadio_cache.track_played_by_subdivision__this_year where cugate_track_id=17988297 ORDER BY country_code) ee where ee.RowNumber<4 order by ee.played_num desc");
+        $r = $mysqli->query("select gg.* from (SELECT city,country_code,played_num,rank_num,@row_num := IF(@subdivision_code=subdivision_code,@row_num+1,1) AS RowNumber,@subdivision_code:= subdivision_code as subdivision_code FROM curadio_cache.track_played_by_city__this_year where cugate_track_id=17988297 ORDER BY subdivision_code) gg where gg.RowNumber<=3 order by gg.played_num desc");
+        $r = $mysqli->query("select ii.* from (SELECT station_id,country_code,subdivision_code,played_num,rank_num,@row_num := IF(@city=city,@row_num+1,1) AS RowNumber,@city:= city as city FROM curadio_cache.track_played_by_station__this_year where cugate_track_id=17988297 ORDER BY city) ii where ii.RowNumber<=3 order by ii.played_num desc");
+        fwrite($dev_f,PHP_EOL.PHP_EOL);
+        $r = $mysqli->query($query);
+        $continent_code = "";
+        $country_code  = "";
+        $subdivision_code  = "";
+        $city  = "";
+        if($r && $r->num_rows) {
+            while($row = $r->fetch_assoc()) {
+                if($continent_code != $row['continent_code']){
+                    $country_code  = "";
+                    $continent_code = $row['continent_code'];
+                    $played_num_continent = $row['continent_played_num'];
+                    $rank_num_continent = $row['continent_rank_num'];
+
+                    $result['continent'][$continent_code][0] = (int)$played_num_continent;
+                    $result['continent'][$continent_code][1] = (int)$rank_num_continent;
+                    $result['continent'][$continent_code]['daytime'] = $row['continent_daytime'];
+                }
+                
+                //fwrite($dev_f,"	    row=".json_encode($row).PHP_EOL);
+                if($country_code != $row['country_code']){
+                    $subdivision_code  = "";
+                    $country_code = $row['country_code'];
+                    $played_num_country = $row['country_played_num'];
+                    $rank_num_country = $row['country_rank_num'];
+
+                    $result['continent'][$continent_code]['country'][$country_code][0] = (int)$played_num_country;
+                    $result['continent'][$continent_code]['country'][$country_code][1] = (int)$rank_num_country;
+                    $result['continent'][$continent_code]['country'][$country_code]['daytime'] = $row['country_daytime'];
+
+                    //AMOUNTS - Composer
+                    if($amounts_arr['composer']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="composer", $country_code, $subdivision_code="", $city="", $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                                
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['amount_composer'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['amount_composer_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+    
+                    //AMOUNTS - Artist
+                    if($amounts_arr['artist']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="artist", $country_code, $subdivision_code="", $city="", $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                        
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['amount_artist'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['amount_artist_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+                    //-----------------------------    
+                }
+                
+                if($subdivision_code != $row['subdivision_code']){
+                    //track played by subdivision
+                    $city  = "";
+                    $subdivision_code = $row['subdivision_code'];
+                    $played_num_subdivision = $row['subdivision_played_num'];
+                    $rank_num_subdivision = $row['subdivision_rank_num'];
+
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code][0] = (int)$played_num_subdivision;
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code][1] = (int)$rank_num_subdivision;
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['daytime'] = $row['subdivision_daytime'];
+                            
+                            
+                    //AMOUNTS - Compsoer
+                    if($amounts_arr['composer']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="composer", $country_code, $subdivision_code, $city="", $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                        
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['amount_composer'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['amount_composer_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+                    //-----------------------------   
+                    
+                    //AMOUNTS - Artist
+                    if($amounts_arr['artist']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="artist", $country_code, $subdivision_code, $city="", $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                        
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['amount_artist'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['amount_artist_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+                }
+                        
+                if($city != $row['city']){
+                    $city = $row['city'];
+                    $played_num_city = $row['city_played_num'];
+                    $rank_num_city = $row['city_rank_num'];
+
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city][0] = (int)$played_num_city;
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city][1] = (int)$rank_num_city;
+                    $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['daytime'] = $row['city_daytime'];
+                                                            
+                    //AMOUNTS - Composer
+                    if($amounts_arr['composer']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="composer", $country_code, $subdivision_code, $city, $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                        
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['amount_composer'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['amount_composer_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+                    //-----------------------------
+                    
+                    //AMOUNTS - Artist
+                    if($amounts_arr['artist']) {
+                        $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="artist", $country_code, $subdivision_code, $city, $station_id=0);
+                        if(count($amounts) > 0) {
+                            $str_daytime = $amounts['currency_code'].",";
+                            $str_total = $amounts['currency_code'].",";
+                            $total_amount = 0;
+                        
+                            for($i=0; $i<24; $i++) {
+                                $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                                $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                                $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                        
+                                $total_amount += $amount;
+                            }
+                            $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                            $str_total .= $total_amount;
+                        
+                            if($total_amount > 0) {
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['amount_artist'] = $str_total;
+                                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['amount_artist_daytime'] = $str_daytime;
+                            }
+                        }
+                    }
+                }
+                                                                    
+                $station_id = $row['station_id'];
+                $played_num_station = $row['station_played_num'];
+                $rank_num_station = $row['station_rank_num'];
+
+                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id][0] = (int)$played_num_station;
+                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id][1] = (int)$rank_num_station;
+                $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id]['daytime'] = $row['station_daytime'];
+                
+                //AMOUNTS - Composer
+                if($amounts_arr['composer']) {
+                    $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="composer", $country_code, $subdivision_code, $city, $station_id);
+                    if(count($amounts) > 0) {
+                        $str_daytime = $amounts['currency_code'].",";
+                        $str_total = $amounts['currency_code'].",";
+                        $total_amount = 0;
+                    
+                        for($i=0; $i<24; $i++) {
+                            $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                            $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                            $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                    
+                            $total_amount += $amount;
+                        }
+                        $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                        $str_total .= $total_amount;
+                    
+                        if($total_amount > 0) {
+                            $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id]['amount_composer'] = $str_total;
+                            $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id]['amount_composer_daytime'] = $str_daytime;
+                        }
+                    }
+                }
+                //-----------------------------   
+                
+                //AMOUNTS - Artist
+                if($amounts_arr['artist']) {
+                    $amounts = cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $track_id, $time_period, $year, $is_daytime=true, $amount_sum=true, $object="artist", $country_code, $subdivision_code, $city, $station_id);
+                    if(count($amounts) > 0) {
+                        $str_daytime = $amounts['currency_code'].",";
+                        $str_total = $amounts['currency_code'].",";
+                        $total_amount = 0;
+                    
+                        for($i=0; $i<24; $i++) {
+                            $index = ($i < 10) ? "amount_0$i" : "amount_$i";
+                            $amount = ($amounts[$index] > 0) ? round($amounts[$index]) : 0;
+                            $str_daytime .= ($amount > 0) ? $amount."," : ",";
+                    
+                            $total_amount += $amount;
+                        }
+                        $str_daytime = substr($str_daytime, 0, strlen($str_daytime)-1);
+                        $str_total .= $total_amount;
+                    
+                        if($total_amount > 0) {
+                            $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id]['amount_artist'] = $str_total;
+                            $result['continent'][$continent_code]['country'][$country_code]['subdivision'][$subdivision_code]['city'][$city]['station'][$station_id]['amount_artist_daytime'] = $str_daytime;
+                        }
+                    }
+                }
+                //-----------------------------                                                
             }
         }
     }

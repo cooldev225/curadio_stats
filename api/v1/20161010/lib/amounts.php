@@ -61,9 +61,10 @@ function cug_rms_stat_get_amounts_of_track($mysqli, $db_name, $track_id_field, $
 
     //generate SQL query
     $query = cug_rms_stat_gen_query_amount_for_track($track_id_field, $track_id, $start_date, $end_date, $cache_table, $price_table, $coefficient_table, $is_daytime, $amount_sum, $object, $country_code, $subdivision_code, $city, $station_id);
-    
-    //echo PHP_EOL.$query.PHP_EOL;
-    
+    if(strpos($query,"SUM(())")!==false)return $result;
+    $dev_f = fopen("log_dev.txt", "a");
+    //if($subdivision_code==""&&$object=="composer")
+    fwrite($dev_f,"	    cug_rms_stat_gen_query_amount_for_track=".$query.PHP_EOL);    
     //execute query
     $r = $mysqli->query($query);
     if($r && $r->num_rows) {
